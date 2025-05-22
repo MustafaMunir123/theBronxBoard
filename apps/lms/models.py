@@ -20,6 +20,7 @@ class EnrolledCourse(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='enrollments')
     student = models.ForeignKey(BaseUserModel, on_delete=models.CASCADE, related_name='enrolled_courses')
     completed = models.BooleanField(default=False)
+    enabled = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.student} enrolled in {self.course}"

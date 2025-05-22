@@ -34,11 +34,16 @@ class SignInView(APIView):
         user = authenticate(username=username, password=password)
 
         if user:
+            user_data = model_to_dict(user)
+            user_data.pop("password")
+            user_data.pop("groups")
+            user_data.pop("user_permissions")
             token, _ = Token.objects.get_or_create(user=user)
             return Response({
                 'success': True,
                 'message': 'Login successful.',
-                'token': token.key
+                'token': token.key,
+                **user_data
             }, status=status.HTTP_200_OK)
 
         return Response({
