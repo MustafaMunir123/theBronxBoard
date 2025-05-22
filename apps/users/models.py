@@ -18,6 +18,7 @@ class BaseUserModel(AbstractUser):
         null=True,
         blank=True,
     )
+    invited_by = models.EmailField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.username} --- {self.type}"

@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'apps.users',
     'apps.news',
+    'apps.lms'
 ]
 
 MIDDLEWARE = [
@@ -137,3 +138,23 @@ REST_FRAMEWORK = {
 }
 
 NEWS_API_KEY = os.environ.get("NEWS_API_KEY")
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')  
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
+EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False') == 'True'
+
+# import os
+# from django.core.mail import send_mail
+# from django.conf import settings
+# send_mail(
+#     'SMTP Chl raha',
+#     'Rashid apni separate branch me kaam kr.',
+#     settings.EMAIL_HOST_USER,  
+#     ['hamzabinrashid32@gmail.com '], 
+#     fail_silently=False,
+# )
