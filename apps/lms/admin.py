@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Course, EnrolledCourse, Quiz, QuizContent, Result
+from .models import Course, EnrolledCourse, Quiz, QuizContent, Result, Resourse
 
 
 @admin.register(Course)
@@ -32,3 +32,9 @@ class QuizContentAdmin(admin.ModelAdmin):
 class ResultAdmin(admin.ModelAdmin):
     list_display = ('quiz', 'attempt_number', 'obtained_score')
     search_fields = ('quiz__learning_path_title',)
+    
+
+@admin.register(Resourse)
+class ResourseAdmin(admin.ModelAdmin):
+    list_display = ("title", "type", "website")
+    search_fields = ("title", "description", "type")

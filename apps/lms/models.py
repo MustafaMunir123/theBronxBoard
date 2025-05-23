@@ -2,6 +2,11 @@ from django.db import models
 from apps.users.models import BaseUserModel
 from uuid import uuid4
 
+TYPE_CHOICES = (
+    ('welfare', 'Welfare'),
+    ('skills', 'Skills'),
+)
+
 
 class Course(models.Model):
     id = models.UUIDField(primary_key=True, editable=False, default=uuid4)
@@ -58,3 +63,13 @@ class Result(models.Model):
 
     def __str__(self):
         return f"Result for {self.quiz} - Attempt #{self.attempt_number} - Score: {self.obtained_score}"
+    
+class Resourse(models.Model):
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid4)
+    title = models.CharField(null=False, blank=False, max_length=300)
+    description = models.TextField()
+    website = models.URLField()
+    type = models.CharField(choices=TYPE_CHOICES, max_length=50, null=False, blank=False)
+
+    def __str__(self):
+        return f"{self.title} ({self.get_type_display()})"

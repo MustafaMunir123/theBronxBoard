@@ -2,7 +2,11 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Course, EnrolledCourse
+from apps.lms.models import (
+    Course, 
+    EnrolledCourse, 
+    Resourse
+)
 from apps.users.models import BaseUserModel
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
@@ -69,16 +73,6 @@ class EnrollStudentInCourse(APIView):
             "learning_path_title": learning_path_title
         }, status=status.HTTP_201_CREATED)
         
-        
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
-from django.forms.models import model_to_dict
-
-from apps.lms.models import Course, EnrolledCourse
-
 
 class GetStudentEnrollments(APIView):
     authentication_classes = [TokenAuthentication]
@@ -159,16 +153,6 @@ class GetCourseCatalog(APIView):
             "message": f"Course: {learning_path_title}",
             "enrollments": complete_catalog
         }, status=status.HTTP_200_OK)
-            
-            
-            
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.authentication import TokenAuthentication
-from django.shortcuts import get_object_or_404
-from .models import EnrolledCourse
 
 
 class EnrolledCourseDetailView(APIView):
@@ -229,4 +213,32 @@ class EnrolledCourseDetailView(APIView):
         return Response({
             "success": True,
             "message": "Marked as read",
+        }, status=status.HTTP_200_OK)
+        
+        
+class ListResources(APIView):
+    def get(self, request, type):
+
+        if not type:
+            return Response({
+                "success": False,
+                "message": "Missing required field in path: type."
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        resources = Resourse.objects.filter(type=type)
+        data = []
+
+        for res in resources:
+            data.append({
+                "id": str(res.id),
+                "title": res.title,
+                "description": res.description,
+                "website": res.website,
+                "type": res.get_type_display()  # human-readable version
+            })
+
+        return Response({
+            "success": True,
+            "message": "Resources fetched successfully.",
+            "resources": data
         }, status=status.HTTP_200_OK)
