@@ -138,6 +138,7 @@ REST_FRAMEWORK = {
 }
 
 NEWS_API_KEY = os.environ.get("NEWS_API_KEY")
+GROQ_TOKEN = os.environ.get("GROQ_TOKEN")
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -158,3 +159,4 @@ EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False') == 'True'
 #     ['hamzabinrashid32@gmail.com '], 
 #     fail_silently=False,
 # )
+

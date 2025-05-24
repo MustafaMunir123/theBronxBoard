@@ -49,6 +49,7 @@ class QuizContent(models.Model):
     student_answer = models.TextField(null=False, blank=False)
     marks = models.IntegerField(default=0)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name="contents")
+    attempt_number = models.IntegerField(null=False, blank=False)
 
     def __str__(self):
         return f"Question for {self.quiz} - Marks: {self.marks}"
