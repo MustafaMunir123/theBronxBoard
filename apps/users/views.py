@@ -9,6 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from django.forms.models import model_to_dict
 from django.contrib.auth.hashers import make_password
+from apps.utility import send_html_email
 
 
 from apps.utility import generate_random_password
@@ -96,7 +97,6 @@ class InviteStudent(APIView):
         
         invited_students = []
         skipped_emails = []
-        
         for email in emails_list:
             if BaseUserModel.objects.filter(email=email).exists():
                 skipped_emails.append(email)
@@ -117,6 +117,14 @@ class InviteStudent(APIView):
                 "username": student.username,
                 "password": password
             })
+            context={
+                "email": "mustafamunir10@gmail.com", #student.email,
+                "username": student.username,
+                "password": password,
+                "subject": "Class Invitation"
+            }
+            send_html_email([context["email"]],'users/send_invite.html',context)
+            
             
             # TODO: Send email invite
             # send_invite_email(invited_students)
