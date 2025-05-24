@@ -12,3 +12,6 @@ LEGAL_LITERACY_CIVIC_EDUCATION_QUESTIONS = """
 Generate 12 knowledge based questions and their answers on topic: `LEGAL_LITERACY_CIVIC_EDUCATION` for middle school students from following links: 1=> https://www.bronxlgj.org/about?utm_source=chatgpt.com 2=> https://www.chslsj.org/our-education-design?utm_source=chatgpt.com 3=> https://jrcnyc.org/site/law-enforcement-academy/?utm_source=chatgpt.com. 
 Return answer in a json list of objects like: [{}, {}], do not provide anything else other than json.
 """
+
+NEWS_LESSONS_PROMPT="""###############NEWS=====>{NEWS}.. ############.You are tasked with analyzing above crime news and creating engaging `lesson` for teens and kids. Your goal is to teach important values and safety awareness based on above news provided. Format the output with:\n\nA brief `lesson` of the news story. Return answer in a json format like: {{ `lesson`: <LESSON>}}, only return lesson key-value pair in json.
+"""

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      background: #ffffff;
+      margin: 20px auto;
+      padding: 30px;
+      max-width: 600px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.08);
+    }
+    .header {
+      text-align: center;
+      background-color: #4a90e2;
+      color: white;
+      padding: 20px;
+      font-size: 24px;
+      border-radius: 10px 10px 0 0;
+    }
+    .message {
+      margin-top: 20px;
+      font-size: 16px;
+      color: #444;
+      line-height: 1.6;
+    }
+    .credentials {
+      background-color: #f4f6f8;
+      padding: 15px;
+      margin: 20px 0;
+      border-left: 5px solid #4a90e2;
+      border-radius: 5px;
+    }
+    .credentials p {
+      margin: 8px 0;
+      font-size: 15px;
+    }
+    .footer {
+      margin-top: 30px;
+      text-align: center;
+      font-size: 13px;
+      color: #999;
+    }
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #4a90e2;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      🎓 You're Invited!
+    </div>
+
+    <div class="message">
+      Hello {{ username }},
+      <br><br>
+      You’ve been invited to join our student platform. Below are your login credentials:
+    </div>
+
+    <div class="credentials">
+      <p><strong>Email:</strong> {{ email }}</p>
+      <p><strong>Password:</strong> {{ password }}</p>
+    </div>
+
+    <div class="message">
+      Please use these credentials to log in to your student portal and explore the educational resources.
+      <br><br>
+      <a href="https://yourdomain.com/login" class="button">Login Now</a>
+    </div>
+
+    <div class="footer">
+      If you did not expect this email, please ignore it or contact support.
+    </div>
+  </div>
+</body>
+</html>
