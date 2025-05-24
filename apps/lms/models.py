@@ -7,10 +7,15 @@ TYPE_CHOICES = (
     ('skills', 'Skills'),
 )
 
+LEARNING_PATHS_CHOICES = (
+    ('Adolescent Pregnancy Prevention', 'Adolescent Pregnancy Prevention'),
+    ('Youth Crime & Gang Prevention', 'Youth Crime & Gang Prevention'),
+    ('Legal Literacy & Civic Education', 'Legal Literacy & Civic Education')
+)
 
 class Course(models.Model):
     id = models.UUIDField(primary_key=True, editable=False, default=uuid4)
-    learning_path_title = models.CharField(null=False, blank=False, max_length=300)
+    learning_path_title = models.CharField(null=False, blank=False, max_length=300, choices=LEARNING_PATHS_CHOICES)
     content_title = models.CharField(unique=True, null=False, blank=False, max_length=300)
     content = models.TextField(null=False, blank=False)
     reference = models.TextField(null=False, blank=False)
@@ -52,7 +57,7 @@ class QuizContent(models.Model):
     attempt_number = models.IntegerField(null=False, blank=False)
 
     def __str__(self):
-        return f"Question for {self.quiz} - Marks: {self.marks}"
+        return f"Question: {self.question[:30]} - Marks: {self.marks}"
 
 
 class Result(models.Model):

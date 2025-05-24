@@ -22,11 +22,7 @@ class QuizAdmin(admin.ModelAdmin):
     search_fields = ('student__email', 'learning_path_title')
 
 
-@admin.register(QuizContent)
-class QuizContentAdmin(admin.ModelAdmin):
-    list_display = ('quiz', 'marks')
-    search_fields = ('question', 'quiz__learning_path_title')
-
+admin.site.register(QuizContent)
 
 @admin.register(Result)
 class ResultAdmin(admin.ModelAdmin):

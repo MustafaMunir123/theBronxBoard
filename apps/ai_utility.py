@@ -1,6 +1,7 @@
 import requests
 import json
 from django.conf import settings
+import re
 
 def extract_json_from_response(response_text: str):
     """
@@ -26,7 +27,7 @@ def get_ai_response(content: str) -> str | None:
         url = "https://api.groq.com/openai/v1/chat/completions"
         headers = {
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {settings.GROK_TOKEN}"
+            "Authorization": f"Bearer {settings.GROQ_TOKEN}"
         }
         
         payload = {
@@ -42,17 +43,18 @@ def get_ai_response(content: str) -> str | None:
                 }
             ]
         }
-        
+    
         response = requests.post(url, headers=headers, json=payload)
         
         if response.status_code == 200:
             data = response.json()
             ai_reply = data["choices"][0]["message"]["content"]
-            if "json" in ai_reply or "Json" in ai_reply or "JSON" in ai_reply:
+            print(type(ai_reply))
+            if "json" in ai_reply:
                 ai_reply = ai_reply.replace('json', '')
 
-            parsed_json = extract_json_from_response(response)
-            return parsed_json.strip()
+            parsed_json = extract_json_from_response(ai_reply)
+            return parsed_json
         else:
             None
     except Exception as ex:

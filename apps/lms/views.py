@@ -1,16 +1,25 @@
 # views.py
+import time
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from apps.lms.models import (
     Course, 
+    Quiz,
     EnrolledCourse, 
-    Resourse
+    Resourse,
+    Result,
+    QuizContent,
+    LEARNING_PATHS_CHOICES
 )
-from apps.users.models import BaseUserModel
-from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
+from apps.ai_templates import (
+    PREGNANCY_PREVENTION_QUESTIONS,
+    LEGAL_LITERACY_CIVIC_EDUCATION_QUESTIONS,
+    YOUTH_CRIME_GANG_PREVENTION_QUESTIONS
+)
+from apps.ai_utility import get_ai_response
 
 
 class EnrollStudentInCourse(APIView):
@@ -241,4 +250,97 @@ class ListResources(APIView):
             "success": True,
             "message": "Resources fetched successfully.",
             "resources": data
+        }, status=status.HTTP_200_OK)
+        
+
+class GenerateQuiz(APIView):
+    def post(self, request):
+        student = request.user
+        
+        if getattr(student, "type", None) != "student":
+            return Response({
+                "success": False,
+                "message": "User is not a student."
+            }, status=status.HTTP_403_FORBIDDEN)
+            
+        learning_path_title = request.data.get('learning_path_title')
+
+        if not learning_path_title:
+            return Response({
+                "success": False,
+                "message": "Missing required field: learning_path_title."
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        prompt = ""
+        if learning_path_title == LEARNING_PATHS_CHOICES[0][0]:
+            prompt = PREGNANCY_PREVENTION_QUESTIONS
+        elif learning_path_title == LEARNING_PATHS_CHOICES[1][0]:
+            prompt = YOUTH_CRIME_GANG_PREVENTION_QUESTIONS
+        elif learning_path_title == LEARNING_PATHS_CHOICES[2][0]:
+            prompt = LEGAL_LITERACY_CIVIC_EDUCATION_QUESTIONS
+        else:
+            return Response({
+                "success": False,
+                "message": "Course title is incorrect"
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        attempt_number = len(Quiz.objects.filter(learning_path_title=learning_path_title, student=student))
+        quiz = Quiz(
+                student=student,
+                learning_path_title=learning_path_title,
+                eligiblity=True,
+                attempts=attempt_number + 1
+            )
+        quiz.save()
+
+        retries = 3
+        response = None
+        last_exception = None
+
+        while retries > 0 and response is None:
+            try:
+                response = get_ai_response(content=prompt)
+                # if len(response) < 12:
+                #     raise ValueError("0")
+                print(len(response))
+                break
+            except Exception as ex:
+                response = None
+                print(f"Exception occurred: {ex}")
+                last_exception = ex
+                retries -= 1
+                if retries > 0:
+                    print("Retrying...")
+                else:
+                    print("All retries exhausted.")
+                time.sleep(1)
+        if response is None and last_exception:
+            return Response({
+                "success": False,
+                "message": "Unable to generate quiz."
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        data = []
+        serial_number = 1
+        for generated_qna in response:
+            qna = QuizContent(
+                question = generated_qna["question"],
+                actual_answer = generated_qna["answer"],
+                student_answer = "",
+                quiz = quiz,
+                attempt_number = attempt_number + 1
+            )
+            qna.save()
+            data.append(
+                {   
+                    "serial_number": serial_number,
+                    "question_id": qna.id
+                }
+            )
+            serial_number += 1
+            
+        return Response({
+            "success": True,
+            "message": "AI Generated Quiz is ready.",
+            "questions": data
         }, status=status.HTTP_200_OK)
