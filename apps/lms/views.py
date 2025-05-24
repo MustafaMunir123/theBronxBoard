@@ -20,6 +20,8 @@ from apps.ai_templates import (
     YOUTH_CRIME_GANG_PREVENTION_QUESTIONS
 )
 from apps.ai_utility import get_ai_response
+from django.forms.models import model_to_dict
+
 
 
 class EnrollStudentInCourse(APIView):
@@ -342,5 +344,35 @@ class GenerateQuiz(APIView):
         return Response({
             "success": True,
             "message": "AI Generated Quiz is ready.",
+            "quiz_id": quiz.id,
             "questions": data
         }, status=status.HTTP_200_OK)
+        
+
+class GetQuizContentById(APIView):
+    """
+    GET /api/quiz-content/{id}/
+    """
+
+    def get(self, request, id):
+        try:
+            quiz_content = QuizContent.objects.get(id=id)
+            quiz_content_data = model_to_dict(quiz_content)
+            print(quiz_content_data.pop("actual_answer"))
+
+            return Response({
+                "success": True,
+                "message": "QuizContent fetched successfully.",
+                "data": quiz_content_data
+            }, status=status.HTTP_200_OK)
+
+        except QuizContent.DoesNotExist:
+            return Response({
+                "success": False,
+                "message": f"No QuizContent found with id {id}."
+            }, status=status.HTTP_404_NOT_FOUND)
+        except Exception as ex:
+            return Response({
+                "success": False,
+                "message": f"An error occurred: {str(ex)}"
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
