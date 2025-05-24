@@ -228,6 +228,9 @@ class EnrolledCourseDetailView(APIView):
         
         
 class ListResources(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, type):
 
         if not type:
@@ -256,6 +259,8 @@ class ListResources(APIView):
         
 
 class GenerateQuiz(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         student = request.user
         
@@ -354,6 +359,8 @@ class GetQuizContentById(APIView):
     """
     GET /api/quiz-content/{id}/
     """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, id):
         try:
@@ -377,3 +384,20 @@ class GetQuizContentById(APIView):
                 "success": False,
                 "message": f"An error occurred: {str(ex)}"
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+            
+class GetCoursesTitles(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    
+    def get(self, request):
+        data = []
+        for course in LEARNING_PATHS_CHOICES:
+            data.append(course[0])
+        return Response({
+                "success": True,
+                "message": "QuizContent fetched successfully.",
+                "data": data
+            }, status=status.HTTP_200_OK)
+    

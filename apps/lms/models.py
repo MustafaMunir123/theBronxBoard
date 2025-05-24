@@ -16,7 +16,7 @@ LEARNING_PATHS_CHOICES = (
 class Course(models.Model):
     id = models.UUIDField(primary_key=True, editable=False, default=uuid4)
     learning_path_title = models.CharField(null=False, blank=False, max_length=300, choices=LEARNING_PATHS_CHOICES)
-    content_title = models.CharField(unique=True, null=False, blank=False, max_length=300)
+    content_title = models.CharField(unique=False, null=False, blank=False, max_length=300)
     content = models.TextField(null=False, blank=False)
     reference = models.TextField(null=False, blank=False)
     serial_number = models.IntegerField(null=False, blank=False)

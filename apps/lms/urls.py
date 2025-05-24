@@ -7,7 +7,8 @@ from apps.lms.views import (
     EnrolledCourseDetailView,
     ListResources,
     GenerateQuiz,
-    GetQuizContentById
+    GetQuizContentById,
+    GetCoursesTitles
 )
 
 urlpatterns = [
@@ -18,4 +19,5 @@ urlpatterns = [
     path('resource/<str:type>', ListResources.as_view()),
     path('quiz/generate', GenerateQuiz.as_view()),
     path('quiz/question/<uuid:id>', GetQuizContentById.as_view()),
+    path('courses', GetCoursesTitles.as_view())
 ]
