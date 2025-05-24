@@ -51,7 +51,7 @@ class QuizContent(models.Model):
     id = models.UUIDField(primary_key=True, editable=False, default=uuid4)
     question = models.TextField(null=False, blank=False)
     actual_answer = models.TextField(null=False, blank=False)
-    student_answer = models.TextField(null=False, blank=False)
+    student_answer = models.TextField()
     marks = models.IntegerField(default=0)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name="contents")
     attempt_number = models.IntegerField(null=False, blank=False)

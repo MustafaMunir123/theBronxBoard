@@ -3,10 +3,15 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
-from .serializers import RegisterSerializer
+from apps.users.serializers import RegisterSerializer
+from apps.users.models import BaseUserModel
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from django.forms.models import model_to_dict
+from django.contrib.auth.hashers import make_password
+
+
+from apps.utility import generate_random_password
 
 class SignUpView(APIView):
     def post(self, request):
@@ -69,3 +74,56 @@ class GetUserDetails(APIView):
             "message": "User details retrieved successfully.",
             **user_data
         }, status=status.HTTP_200_OK)
+        
+class InviteStudent(APIView):
+    def post(self, request):
+        teacher = request.user
+        emails = request.data.get("emails", "")
+
+        if getattr(teacher, "type", None) != "teacher":
+            return Response({
+                "success": False,
+                "message": "User is not a Teacher."
+            }, status=status.HTTP_403_FORBIDDEN)
+
+        if not emails:
+            return Response({
+                "success": False,
+                "message": "Provide at least one student email."
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        emails_list = [email.strip() for email in emails.split(",")]
+        
+        invited_students = []
+        skipped_emails = []
+        
+        for email in emails_list:
+            if BaseUserModel.objects.filter(email=email).exists():
+                skipped_emails.append(email)
+                continue
+            
+            password = generate_random_password()
+            student = BaseUserModel(
+                email=email,
+                type="student",
+                invited_by=teacher.email,
+                password=make_password(password),
+                username=email.split("@")[0]
+            )
+            student.save()  # Save to DB
+
+            invited_students.append({
+                "email": student.email,
+                "username": student.username,
+                "password": password
+            })
+            
+            # TODO: Send email invite
+            # send_invite_email(invited_students)
+
+        return Response({
+            'success': True,
+            'message': 'Invitations sent successfully.',
+            'invited': invited_students,
+            'skipped': skipped_emails
+        }, status=status.HTTP_200_OK)            
