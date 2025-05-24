@@ -336,7 +336,8 @@ class GenerateQuiz(APIView):
             data.append(
                 {   
                     "serial_number": serial_number,
-                    "question_id": qna.id
+                    "question_id": qna.id,
+                    "question": qna.question
                 }
             )
             serial_number += 1
