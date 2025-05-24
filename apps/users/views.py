@@ -118,9 +118,10 @@ class InviteStudent(APIView):
                 "password": password
             })
             context={
-                "email": student.email,
+                "email": "mustafamunir10@gmail.com", #student.email,
                 "username": student.username,
-                "password": password
+                "password": password,
+                "subject": "Class Invitation"
             }
             send_html_email([context["email"]],'users/send_invite.html',context)
             
