@@ -3,12 +3,14 @@ from apps.users.views import (
     SignInView,
     SignUpView,
     GetUserDetails,
-    InviteStudent
+    InviteStudent,
+    GetAllStudents
 )
 
 urlpatterns = [
     path("login", SignInView.as_view()),
     path("signup", SignUpView.as_view()),
     path("details", GetUserDetails.as_view()),
-    path("invite", InviteStudent.as_view())
+    path("invite", InviteStudent.as_view()),
+    path("students", GetAllStudents.as_view()),
 ]

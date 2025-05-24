@@ -126,4 +126,24 @@ class InviteStudent(APIView):
             'message': 'Invitations sent successfully.',
             'invited': invited_students,
             'skipped': skipped_emails
-        }, status=status.HTTP_200_OK)            
+        }, status=status.HTTP_200_OK)
+        
+        
+class GetAllStudents(APIView):
+    def get(self, request):
+        teacher = request.user
+        
+        if getattr(teacher, "type", None) != "teacher":
+            return Response({
+                "success": False,
+                "message": "User is not a Teacher."
+            }, status=status.HTTP_403_FORBIDDEN)
+
+        students = BaseUserModel.objects.filter(type="student", invited_by=teacher.email)
+        students_data = [model_to_dict(student) for student in students]
+        
+        return Response({
+            "success": True,
+            "message": "Students fetched successfully.",
+            "students": students_data
+        }, status=status.HTTP_200_OK)
