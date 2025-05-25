@@ -1,6 +1,7 @@
 # views.py
 import random
 import time
+import os
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -26,9 +27,8 @@ from apps.ai_utility import get_ai_response
 from django.forms.models import model_to_dict
 
 from apps.users.models import BaseUserModel
-from apps.utility import send_html_email,send_html_email_with_attachment
+from apps.utility import send_html_email_with_attachment
 from django.conf import settings
-import os
 
 class EnrollStudentInCourse(APIView):
     authentication_classes = [TokenAuthentication]
@@ -482,13 +482,22 @@ class SubmitQuizAPI(APIView):
     """
     API to process a quiz submission and calculate the result.
     """
-
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def post(self, request):
         quiz_id = request.data.get('quiz_id')
         student = request.user
-
-
-        result = Result.objects.filter(id=quiz_id)
+        
+        if not quiz_id:
+            return Response({
+                "success": False,
+                "message": "Missing quiz_id in request."
+            }, status=status.HTTP_400_BAD_REQUEST)
+        quiz = Quiz.objects.filter(id=quiz_id)
+        
+        result = Result.objects.filter(quiz=quiz.first())
+        
         # If result already calculated
         if result.exists() and result.first().obtained_score:
             result = result.first()
@@ -556,10 +565,10 @@ class SubmitQuizAPI(APIView):
         if result_status == "Pass":
             context = {
                     "username": student.username,
-                    "course_title": 'quiz.learning_path_title',
+                    "course_title": quiz.first().learning_path_title,
                     "subject": "Certificate of Completion"}
             certificate = os.path.join(settings.BASE_DIR, 'static/certificate.pdf')
-            send_html_email_with_attachment(['hamzabinrashid32@gmail.com','mustafamunir10@gmail.com'],'lms/completion_certificate.html',context,certificate,attachment_name=f"{student.username}_certificate.pdf")
+            send_html_email_with_attachment(['hamzabinrashid32@gmail.com','mustafamunir10@gmail.com'],'lms/completion_certificate.html', context, certificate, attachment_name=f"{student.username}_certificate.pdf")
         
         return Response({
             "success": True,

@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from apps.utility import send_html_email
 from apps.users.models import BaseUserModel
-from django.conf import settings
+
 class NewsAPIView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
