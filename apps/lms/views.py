@@ -26,8 +26,9 @@ from apps.ai_utility import get_ai_response
 from django.forms.models import model_to_dict
 
 from apps.users.models import BaseUserModel
-
-
+from apps.utility import send_html_email,send_html_email_with_attachment
+from django.conf import settings
+import os
 
 class EnrollStudentInCourse(APIView):
     authentication_classes = [TokenAuthentication]
@@ -553,8 +554,12 @@ class SubmitQuizAPI(APIView):
             result.save()
 
         if result_status == "Pass":
-            # TODO: call certificate service here
-            pass
+            context = {
+                    "username": student.username,
+                    "course_title": 'quiz.learning_path_title',
+                    "subject": "Certificate of Completion"}
+            certificate = os.path.join(settings.BASE_DIR, 'static/certificate.pdf')
+            send_html_email_with_attachment(['hamzabinrashid32@gmail.com','mustafamunir10@gmail.com'],'lms/completion_certificate.html',context,certificate,attachment_name=f"{student.username}_certificate.pdf")
         
         return Response({
             "success": True,
