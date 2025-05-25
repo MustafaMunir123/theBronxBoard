@@ -15,3 +15,5 @@ Return answer in a json list of objects like: [{}, {}], do not provide anything 
 
 NEWS_LESSONS_PROMPT="""###############NEWS=====>{NEWS}.. ############.You are tasked with analyzing above crime news and creating engaging `lesson` for teens and kids. Your goal is to teach important values and safety awareness based on above news provided. Format the output with:\n\nA brief `lesson` of the news story. Return answer in a json format like: {{ `lesson`: <LESSON>}}, only return lesson key-value pair in json.
 """
+
+SCORE_PROMPT = """#####Questions=> {QUESTION} ### \n#####Actual-Answer=> {ACTUAL_ANSWER} ###\n#####Students-Answer=> {STUDENTS_ANSWER} ###\ncompare Student-Answer with Actual-Answer and assign score out of 5 in format like: {{'score': <SCORE>}}, do not include word json in response and only return valid json with double quotes."""

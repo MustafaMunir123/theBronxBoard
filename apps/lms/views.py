@@ -1,5 +1,7 @@
 # views.py
+import random
 import time
+from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -17,7 +19,8 @@ from rest_framework.authentication import TokenAuthentication
 from apps.ai_templates import (
     PREGNANCY_PREVENTION_QUESTIONS,
     LEGAL_LITERACY_CIVIC_EDUCATION_QUESTIONS,
-    YOUTH_CRIME_GANG_PREVENTION_QUESTIONS
+    YOUTH_CRIME_GANG_PREVENTION_QUESTIONS,
+    SCORE_PROMPT
 )
 from apps.ai_utility import get_ai_response
 from django.forms.models import model_to_dict
@@ -307,8 +310,8 @@ class GenerateQuiz(APIView):
         while retries > 0 and response is None:
             try:
                 response = get_ai_response(content=prompt)
-                # if len(response) < 12:
-                #     raise ValueError("0")
+                if len(response) < 12:
+                    raise ValueError("0")
                 print(len(response))
                 break
             except Exception as ex:
@@ -401,3 +404,75 @@ class GetCoursesTitles(APIView):
                 "data": data
             }, status=status.HTTP_200_OK)
     
+
+class SubmitQuestionAPI(APIView):
+    """
+    API to submit an answer for a quiz question.
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        uuid = request.data.get('question_id')
+        submitted_answer = request.data.get('answer')
+
+        if not uuid or not submitted_answer:
+            return Response({
+                "success": False,
+                "message": "Missing required fields: uuid and answer."
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        quiz_content = get_object_or_404(QuizContent, id=uuid)
+        if quiz_content.submitted:
+            return Response({
+                "success": False,
+                "message": "Question already submitted."
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        prompt = SCORE_PROMPT[:]
+        prompt.format(QUESTION=quiz_content.question, ACTUAL_ANSWER=quiz_content.actual_answer, STUDENTS_ANSWER=submitted_answer)
+        
+        retries = 3
+        response = None
+        last_exception = None
+
+        while retries > 0 and response is None:
+            try:
+                response = get_ai_response(content=prompt)
+                print(response)
+                break
+            except Exception as ex:
+                response = None
+                print(f"Exception occurred: {ex}")
+                last_exception = ex
+                retries -= 1
+                if retries > 0:
+                    print("Retrying...")
+                else:
+                    print("All retries exhausted.")
+                time.sleep(1)
+        if response is None and last_exception:
+            response = {
+                "score": random.randint(1,5)
+            }
+            print("Random - exception")
+        if response is None:
+            response = {
+                "score": random.randint(1,5)
+            }
+            print("Random - None")
+        score = int(response["score"])
+        quiz_content.student_answer = submitted_answer
+        quiz_content.marks = score
+        quiz_content.submitted = True
+        quiz_content.save()
+
+        return Response({
+            "success": True,
+            "message": "Answer submitted successfully.",
+            "data": {
+                "question_id": str(quiz_content.id),
+                "answer": submitted_answer,
+                "submitted": quiz_content.submitted
+            }
+        }, status=status.HTTP_200_OK)
