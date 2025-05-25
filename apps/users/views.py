@@ -140,7 +140,7 @@ class InviteStudent(APIView):
 class GetAllStudents(APIView):
     def get(self, request):
         teacher = request.user
-        
+
         if getattr(teacher, "type", None) != "teacher":
             return Response({
                 "success": False,
@@ -148,8 +148,14 @@ class GetAllStudents(APIView):
             }, status=status.HTTP_403_FORBIDDEN)
 
         students = BaseUserModel.objects.filter(type="student", invited_by=teacher.email)
-        students_data = [model_to_dict(student) for student in students]
-        
+
+        students_data = []
+        for student in students:
+            # Convert to dict but explicitly add id
+            student_data = model_to_dict(student, exclude=['password', 'groups', 'user_permissions'])
+            student_data['id'] = str(student.id)  # ensure id is included and as string for JSON
+            students_data.append(student_data)
+
         return Response({
             "success": True,
             "message": "Students fetched successfully.",

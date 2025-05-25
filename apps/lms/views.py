@@ -25,6 +25,8 @@ from apps.ai_templates import (
 from apps.ai_utility import get_ai_response
 from django.forms.models import model_to_dict
 
+from apps.users.models import BaseUserModel
+
 
 
 class EnrollStudentInCourse(APIView):
@@ -115,9 +117,6 @@ class GetStudentEnrollments(APIView):
                     "id": str(course.id),
                     "learning_path_title": course.learning_path_title,
                     "content_title": course.content_title,
-                    "content": course.content,
-                    "reference": course.reference,
-                    "serial_number": course.serial_number
                 })
 
         return Response({
@@ -294,7 +293,7 @@ class GenerateQuiz(APIView):
                 "message": "Course title is incorrect"
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        attempt_number = len(Quiz.objects.filter(learning_path_title=learning_path_title, student=student))
+        attempt_number = Quiz.objects.filter(learning_path_title=learning_path_title, student=student).last().attempts
         quiz = Quiz(
                 student=student,
                 learning_path_title=learning_path_title,
@@ -566,4 +565,57 @@ class SubmitQuizAPI(APIView):
                 "percentage": percentage,
                 "status": result_status
             }
+        }, status=status.HTTP_200_OK)
+
+
+class StudentReport(APIView):
+    
+    def get(self, request, id):
+        student = BaseUserModel.objects.filter(id=id).first()
+        if getattr(student, "type", None) != "student":
+            return Response({
+                "success": False,
+                "message": f"ID: {id} does not belong to any student."
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        report = []
+
+        courses = Course.objects.all()
+        course_dict = {}
+        for course in courses:
+            if course.learning_path_title not in course_dict:
+                course_dict[course.learning_path_title] = course
+
+        for course in course_dict.values():
+            if EnrolledCourse.objects.filter(course=course, student=student).exists():
+                quizes = Quiz.objects.filter(student=student, learning_path_title=course.learning_path_title)
+                attempts = []
+
+                for quiz in quizes:
+                    result = Result.objects.filter(quiz=quiz)
+                    if result.exists() and result.first().obtained_score:
+                        result = result.first()
+                        percentage = (result.obtained_score / result.total_score) * 100 if result.total_score > 0 else 0
+                        result_status = "Pass" if percentage >= 70 else "Fail"
+                        attempts.append(
+                            {
+                                "attempt_number": result.attempt_number,
+                                "obtained_marks": result.obtained_score,
+                                "total_marks": result.total_score,
+                                "status": result_status,
+                                "percentage": percentage
+                            }
+                        )
+                if attempts:
+                    report.append({
+                        "id": str(course.id),
+                        "learning_path_title": course.learning_path_title,
+                        "content_title": course.content_title,
+                        "results": attempts
+                    })
+                    
+        return Response({
+            "success": True,
+            "message": f"Report Generated",
+            "report": report
         }, status=status.HTTP_200_OK)
