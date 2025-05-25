@@ -476,3 +476,94 @@ class SubmitQuestionAPI(APIView):
                 "submitted": quiz_content.submitted
             }
         }, status=status.HTTP_200_OK)
+
+
+class SubmitQuizAPI(APIView):
+    """
+    API to process a quiz submission and calculate the result.
+    """
+
+    def post(self, request):
+        quiz_id = request.data.get('quiz_id')
+        student = request.user
+
+
+        result = Result.objects.filter(id=quiz_id)
+        # If result already calculated
+        if result.exists() and result.first().obtained_score:
+            result = result.first()
+            percentage = (result.obtained_score / result.total_score) * 100 if result.total_score > 0 else 0
+            result_status = "Pass" if percentage >= 70 else "Fail"
+            return Response({
+            "success": True,
+            "message": f"Quiz submitted successfully. You {'passed' if result_status == 'Pass' else 'failed'} with {percentage:.2f}%.",
+            "data": {
+                "obtained_marks": result.obtained_score,
+                "total_marks": result.total_score,
+                "percentage": percentage,
+                "status": result_status
+            }
+        }, status=status.HTTP_200_OK)
+            
+        
+        if getattr(student, "type", None) != "student":
+            return Response({
+                "success": False,
+                "message": "User is not a student."
+            }, status=status.HTTP_403_FORBIDDEN)
+
+        if not quiz_id:
+            return Response({
+                "success": False,
+                "message": "Missing quiz_id in request."
+            }, status=status.HTTP_400_BAD_REQUEST)
+        quiz = Quiz.objects.filter(id=quiz_id)
+        quiz_questions = QuizContent.objects.filter(quiz=quiz.first())
+
+        if not quiz_questions.exists():
+            return Response({
+                "success": False,
+                "message": "No questions found for the provided quiz ID."
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        unanswered_questions = quiz_questions.filter(submitted=False)
+
+        if unanswered_questions.exists():
+            return Response({
+                "success": False,
+                "message": "Not all questions have been answered. Please submit all answers."
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        total_marks = len(quiz_questions) * 5
+        obtained_marks = sum(q.marks for q in quiz_questions)
+
+        percentage = (obtained_marks / total_marks) * 100 if total_marks > 0 else 0
+        result_status = "Pass" if percentage >= 70 else "Fail"
+
+        result, created = Result.objects.get_or_create(
+            quiz_id=quiz_id,
+            defaults={
+                "obtained_score": obtained_marks,
+                "total_score": total_marks,
+                "attempt_number": quiz.first().attempts
+            }
+        )
+        if not created:
+            result.obtained_score = obtained_marks
+            result.total_score = total_marks
+            result.save()
+
+        if result_status == "Pass":
+            # TODO: call certificate service here
+            pass
+        
+        return Response({
+            "success": True,
+            "message": f"Quiz submitted successfully. You {'passed' if result_status == 'Pass' else 'failed'} with {percentage:.2f}%.",
+            "data": {
+                "obtained_marks": obtained_marks,
+                "total_marks": total_marks,
+                "percentage": percentage,
+                "status": result_status
+            }
+        }, status=status.HTTP_200_OK)

@@ -58,7 +58,7 @@ class QuizContent(models.Model):
     submitted = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"Question: {self.question[:30]} - Marks: {self.marks}"
+        return f"Question: {self.question[:30]} - Marks: {self.marks} - Submitted: {self.submitted}"
 
 
 class Result(models.Model):
@@ -66,7 +66,8 @@ class Result(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name="results")
     attempt_number = models.IntegerField(null=False, blank=False)
     obtained_score = models.IntegerField(null=False, blank=False)
-    suggestion_to_teacher = models.TextField(null=False, blank=False)
+    total_score = models.IntegerField(null=False, blank=False)
+    suggestion_to_teacher = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return f"Result for {self.quiz} - Attempt #{self.attempt_number} - Score: {self.obtained_score}"

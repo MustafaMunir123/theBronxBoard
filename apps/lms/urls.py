@@ -9,7 +9,8 @@ from apps.lms.views import (
     GenerateQuiz,
     GetQuizContentById,
     GetCoursesTitles,
-    SubmitQuestionAPI
+    SubmitQuestionAPI,
+    SubmitQuizAPI
 )
 
 urlpatterns = [
@@ -21,5 +22,6 @@ urlpatterns = [
     path('quiz/generate', GenerateQuiz.as_view()),
     path('quiz/question/<uuid:id>', GetQuizContentById.as_view()),
     path('courses', GetCoursesTitles.as_view()),
-    path('quiz/question/submit', SubmitQuestionAPI.as_view())
+    path('quiz/question/submit', SubmitQuestionAPI.as_view()),
+    path('quiz/submit', SubmitQuizAPI.as_view())
 ]
