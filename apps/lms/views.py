@@ -220,7 +220,7 @@ class EnrolledCourseDetailView(APIView):
         
         next_material = Course.objects.filter(learning_path_title=content.course.learning_path_title, serial_number=content.course.serial_number + 1)
         if next_material:
-            next_content = EnrolledCourse.objects.get(course=next_material.first())
+            next_content = EnrolledCourse.objects.get(course=next_material.first(), student=student)
             next_content.enabled = True
             next_content.save()
 
