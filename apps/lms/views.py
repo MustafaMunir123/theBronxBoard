@@ -192,7 +192,8 @@ class EnrolledCourseDetailView(APIView):
             "enabled": getattr(content, "enabled", None),
             "title": content.course.content_title,
             "content": content.course.content,
-            "reference": content.course.reference
+            "reference": content.course.reference,
+            "serial_number": content.course.serial_number
         }
 
         return Response({
