@@ -295,7 +295,11 @@ class GenerateQuiz(APIView):
                 "message": "Course title is incorrect"
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        attempt_number = Quiz.objects.filter(learning_path_title=learning_path_title, student=student).last().attempts
+        prev_quiz = Quiz.objects.filter(learning_path_title=learning_path_title, student=student)
+        if prev_quiz.exists():
+            attempt_number = prev_quiz.last().attempts
+        else:
+            attempt_number = 0
         quiz = Quiz(
                 student=student,
                 learning_path_title=learning_path_title,
