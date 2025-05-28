@@ -123,7 +123,7 @@ class InviteStudent(APIView):
                 "password": password
             })
             context={
-                "email": "mustafamunir10@gmail.com", #student.email,
+                "email": student.email,
                 "username": student.username,
                 "password": password,
                 "subject": "Class Invitation"

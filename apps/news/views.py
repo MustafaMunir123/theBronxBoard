@@ -21,10 +21,7 @@ class NewsAPIView(APIView):
                 "url": fetched_news['url'],
                 "image_url": fetched_news['image_url'],
             }
-            print(fetched_news,news_content)
-            #TODO: email service
-            print(BaseUserModel.objects.filter(type='student').values_list('email', flat=True))
-            to_email = ['hamzabinrashid32@gmail.com']#list(BaseUserModel.objects.filter(type='student').values_list('email', flat=True))
+            to_email = list(BaseUserModel.objects.filter(type='student').values_list('email', flat=True))
             send_html_email(to_email,'news/news_lesson.html',context)
             return Response({"success": True, "message": "Email sent"}, status=status.HTTP_200_OK)
         except Exception as e:
