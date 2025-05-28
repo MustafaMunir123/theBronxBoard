@@ -1,4 +1,3 @@
-# views.py
 import random
 import time
 import os
@@ -573,7 +572,7 @@ class SubmitQuizAPI(APIView):
                     "course_title": quiz.first().learning_path_title,
                     "subject": "Certificate of Completion"}
             certificate = os.path.join(settings.BASE_DIR, 'static/certificate.pdf')
-            send_html_email_with_attachment(['hamzabinrashid32@gmail.com','mustafamunir10@gmail.com'],'lms/completion_certificate.html', context, certificate, attachment_name=f"{student.username}_certificate.pdf")
+            send_html_email_with_attachment([student.email],'lms/completion_certificate.html', context, certificate, attachment_name=f"{student.username}_certificate.pdf")
         
         return Response({
             "success": True,
