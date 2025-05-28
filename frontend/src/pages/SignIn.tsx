@@ -46,7 +46,7 @@ const SignIn: React.FC = () => {
             Sign in to your account
           </h1>
           <p className="mt-2 text-gray-600">
-            Continue your learning journey with BronxEdu
+            Continue your learning journey with BronxBoard
           </p>
         </div>
 

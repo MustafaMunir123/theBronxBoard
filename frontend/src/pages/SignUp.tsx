@@ -55,7 +55,7 @@ const SignUp: React.FC = () => {
             Create your account
           </h1>
           <p className="mt-2 text-gray-600">
-            Join BronxEdu and start your educational journey
+            Join BronxBoard and start your educational journey
           </p>
         </div>
 
