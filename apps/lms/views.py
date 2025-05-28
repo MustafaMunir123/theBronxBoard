@@ -1,3 +1,4 @@
+# views.py
 import random
 import time
 import os
@@ -314,9 +315,8 @@ class GenerateQuiz(APIView):
         while retries > 0 and response is None:
             try:
                 response = get_ai_response(content=prompt)
-                if len(response) < 12:
+                if response and len(response) < 12:
                     raise ValueError("0")
-                print(len(response))
                 break
             except Exception as ex:
                 response = None
