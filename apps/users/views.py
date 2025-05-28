@@ -40,11 +40,17 @@ class SignInView(APIView):
         user = authenticate(username=username, password=password)
 
         if user:
-            user_data = model_to_dict(user)
-            user_data.pop("password")
-            user_data.pop("groups")
-            user_data.pop("user_permissions")
             token, _ = Token.objects.get_or_create(user=user)
+            user_data = {
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "type": user.type,
+                "invited_by": user.invited_by,
+                "date_joined": user.date_joined
+            }
             return Response({
                 'success': True,
                 'message': 'Login successful.',
@@ -56,7 +62,6 @@ class SignInView(APIView):
             'success': False,
             'message': 'Invalid credentials.'
         }, status=status.HTTP_401_UNAUTHORIZED)
-
 
 
 class GetUserDetails(APIView):
