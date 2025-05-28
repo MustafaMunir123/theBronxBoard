@@ -5,6 +5,16 @@ Welcome to **The BronxBoard** – a dedicated Learning Management System (LMS) b
 **The BronxBoard** provides access to community-focused courses on civic education, life skills, and personal development. Accredited by an authorized educational body, it ensures quality and recognition, empowering teens to take control of their education and future. Our platform encourages positive engagement, reduces gang influence, and promotes healthy decision-making for Bronx youth.
 
 ---
+## 📚 Navigation
+
+* [Features](#-features)
+* [Setup Instructions](#️-setup-instructions)
+
+  * [Backend (Django + Python)](#1️⃣-backend-django--python)
+  * [Frontend (Node.js)](#2️⃣-frontend-nodejs)
+* [Contributing](#-contributing)
+* [Contact](#-contact)
+---
 
 ## 🌟 Features
 
@@ -25,18 +35,6 @@ Stay informed with Bronx-specific news updates and AI-suggested learning topics 
 
 ---
 
-## 📚 Navigation
-
-* [Features](#features)
-* [Setup Instructions](#️-setup-instructions)
-
-  * [Backend (Django + Python)](#1️⃣-backend-django--python)
-  * [Frontend (Node.js)](#2️⃣-frontend-nodejs)
-* [Contributing](#-contributing)
-* [Contact](#-contact)
-
----
-
 ## ⚙️ Setup Instructions
 
 ### 1️⃣ Backend (Django + Python)
@@ -45,7 +43,6 @@ Stay informed with Bronx-specific news updates and AI-suggested learning topics 
 
    ```bash
    git clone https://github.com/MustafaMunir123/theBronxBoard.git
-   cd bronxboard
    ```
 
 2. **Create a Virtual Environment**
@@ -92,6 +89,19 @@ Stay informed with Bronx-specific news updates and AI-suggested learning topics 
    npm run dev
    ```
 
+4. **Fill the .env**
+```bash
+NEWS_API_KEY=        # https://www.thenewsapi.com/
+GROQ_TOKEN=          # https://console.groq.com/home
+
+
+EMAIL_HOST=          # smtp.gmail.com
+EMAIL_PORT=          # 587
+EMAIL_HOST_USER=     # gmail
+EMAIL_HOST_PASSWORD= # gmail app password
+EMAIL_USE_TLS=       # True
+
+```
 ---
 
 ## 💡 Contributing
